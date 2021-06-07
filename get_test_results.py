@@ -10,8 +10,14 @@ all_precs = []
 all_recalls = []
 all_f1s = []
 all_metrics = []
+v_all_accs = []
+v_all_precs = []
+v_all_recalls = []
+v_all_f1s = []
+v_all_metrics = []
 fname = sys.argv[1]
-with open(fname) as fin:
+valid_fname = sys.argv[2]
+with open(fname) as fin, open(valid_fname) as vfin:
   for line in fin:
     if line.startswith("epoch"):
       key = line.strip()
@@ -29,12 +35,29 @@ with open(fname) as fin:
       all_f1s.append(f1)
       all_metrics.append(metrics)
 
-max_acc = max(all_accs)
-max_acc_index = all_accs.index(max_acc)
-max_f1 = max(all_f1s)
-max_f1_index = all_f1s.index(max_f1)
+  for line in vfin:
+    if line.startswith("epoch"):
+      key = line.strip()
+    else:
+      metrics = json.loads(line.replace("'", '"'))
+      in_scope_acc = metrics['in_scope_accuracy']
+      prec = metrics['out_of_scope_precision']
+      recall = metrics['out_of_scope_recall']
+      f1 = 2*prec*recall/(prec+recall)
+      metrics['out_of_scope_f1'] = f1
 
-print("max in scope accuracy: ", max_acc, " at epoch [{}]".format(max_acc_index+1))
+      v_all_accs.append(in_scope_acc)
+      v_all_precs.append(prec)
+      v_all_recalls.append(recall)
+      v_all_f1s.append(f1)
+      v_all_metrics.append(metrics)
+
+max_acc = max(v_all_accs)
+max_acc_index = v_all_accs.index(max_acc)
+max_f1 = max(v_all_f1s)
+max_f1_index = v_all_f1s.index(max_f1)
+
+print("max in scope accuracy: ", all_accs[max_acc_index], " at epoch [{}]".format(max_acc_index+1))
 print("out_of_scope_f1: ", all_metrics[max_acc_index]['out_of_scope_f1'])
-print("max out scope f1: ", max_f1, " at epoch [{}]".format(max_f1_index+1))
+print("max out scope f1: ", all_f1s[max_f1_index], " at epoch [{}]".format(max_f1_index+1))
 print("in_scope_accuracy: ", all_metrics[max_f1_index]['in_scope_accuracy'])

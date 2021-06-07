@@ -26,7 +26,7 @@ with open(fname) as fin, open(valid_fname) as vfin:
       in_scope_acc = metrics['in_scope_accuracy']
       prec = metrics['out_of_scope_precision']
       recall = metrics['out_of_scope_recall']
-      f1 = 2*prec*recall/(prec+recall)
+      f1 = 2*prec*recall/(prec+recall+1e-12)
       metrics['out_of_scope_f1'] = f1
 
       all_accs.append(in_scope_acc)
@@ -43,7 +43,7 @@ with open(fname) as fin, open(valid_fname) as vfin:
       in_scope_acc = metrics['in_scope_accuracy']
       prec = metrics['out_of_scope_precision']
       recall = metrics['out_of_scope_recall']
-      f1 = 2*prec*recall/(prec+recall)
+      f1 = 2*prec*recall/(prec+recall+1e-12)
       metrics['out_of_scope_f1'] = f1
 
       v_all_accs.append(in_scope_acc)

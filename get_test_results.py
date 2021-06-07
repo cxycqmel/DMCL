@@ -14,6 +14,7 @@ def main():
   v_all_precs = []
   v_all_recalls = []
   v_all_f1s = []
+  v_all_avgs = []
   v_all_metrics = []
   fname = sys.argv[1]
   valid_fname = sys.argv[2]
@@ -44,12 +45,14 @@ def main():
         prec = metrics['out_of_scope_precision']
         recall = metrics['out_of_scope_recall']
         f1 = 2*prec*recall/(prec+recall+1e-12)
+        avg = (in_scope_acc + f1) / 2
         metrics['out_of_scope_f1'] = f1
   
         v_all_accs.append(in_scope_acc)
         v_all_precs.append(prec)
         v_all_recalls.append(recall)
         v_all_f1s.append(f1)
+        v_all_avgs.append(avg)
         v_all_metrics.append(metrics)
  
   if len(v_all_metrics) != len(all_metrics):
@@ -59,11 +62,16 @@ def main():
   max_acc_index = v_all_accs.index(max_acc)
   max_f1 = max(v_all_f1s)
   max_f1_index = v_all_f1s.index(max_f1)
+  max_avg = max(v_all_avgs)
+  max_avg_index = v_all_avgs.index(max_avg)
   
   print("max in scope accuracy: ", all_accs[max_acc_index], " at epoch [{}]".format(max_acc_index+1))
   print("out_of_scope_f1: ", all_metrics[max_acc_index]['out_of_scope_f1'])
   print("max out scope f1: ", all_f1s[max_f1_index], " at epoch [{}]".format(max_f1_index+1))
   print("in_scope_accuracy: ", all_metrics[max_f1_index]['in_scope_accuracy'])
+  print("max avg f1 and in_scope_accuracy at epoch [{}]:".format(max_avg_index+1))
+  print("out scope f1: ", all_f1s[max_avg_index])
+  print("in_scope_accuracy: ", all_accs[max_avg_index])
 
 if __name__ == "__main__":
   main()
